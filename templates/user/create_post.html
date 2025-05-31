@@ -1,0 +1,289 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0">
+                    <i class="bi bi-plus-circle"></i> Create New Post
+                </h3>
+            </div>
+            <div class="card-body">
+                <form method="POST" id="postForm">
+                    {{ form.hidden_tag() }}
+                    
+                    <!-- Title Field -->
+                    <div class="form-floating mb-3">
+                        {{ form.title(class="form-control", maxlength="100") }}
+                        {{ form.title.label(class="form-label") }}
+                        {% if form.title.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.title.errors[0] }}
+                            </div>
+                        {% endif %}
+                        <div class="form-text">
+                            <small class="text-muted">Choose a compelling title for your post</small>
+                        </div>
+                    </div>
+
+                    <!-- Content Field -->
+                    <div class="mb-3">
+                        {{ form.content.label(class="form-label") }}
+                        {{ form.content(class="form-control", maxlength="5000") }}
+                        {% if form.content.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.content.errors[0] }}
+                            </div>
+                        {% endif %}
+                        <div class="form-text">
+                            <small class="text-muted">Share your thoughts, ideas, or stories with the community</small>
+                        </div>
+                    </div>
+
+                    <!-- Publishing Options -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                {{ form.is_published(class="form-check-input") }}
+                                {{ form.is_published.label(class="form-check-label") }}
+                                <div class="form-text">
+                                    <small class="text-muted">Uncheck to save as draft</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <div id="autoSaveStatus" class="text-muted small"></div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex gap-2 justify-content-between">
+                        <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to Dashboard
+                        </a>
+                        <div class="btn-group">
+                            <button type="button" id="previewBtn" class="btn btn-outline-info">
+                                <i class="bi bi-eye"></i> Preview
+                            </button>
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Writing Tips -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-lightbulb"></i> Writing Tips
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul class="list-unstyled">
+                            <li><i class="bi bi-check-circle text-success"></i> Keep your title clear and engaging</li>
+                            <li><i class="bi bi-check-circle text-success"></i> Use paragraphs to break up text</li>
+                            <li><i class="bi bi-check-circle text-success"></i> Write in your authentic voice</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="list-unstyled">
+                            <li><i class="bi bi-check-circle text-success"></i> Proofread before publishing</li>
+                            <li><i class="bi bi-check-circle text-success"></i> Save drafts for later editing</li>
+                            <li><i class="bi bi-check-circle text-success"></i> Engage with your readers</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Preview Modal -->
+<div class="modal fade" id="previewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-eye"></i> Post Preview
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <article class="post-preview">
+                    <h2 id="previewTitle">Post Title</h2>
+                    <div class="post-meta mb-3">
+                        <small class="text-muted">
+                            <i class="bi bi-person"></i> By {{ current_user.get_full_name() }}
+                            <span class="mx-2">•</span>
+                            <i class="bi bi-calendar"></i> <span id="previewDate"></span>
+                            <span class="mx-2">•</span>
+                            <span id="previewStatus" class="badge"></span>
+                        </small>
+                    </div>
+                    <div id="previewContent" class="post-content"></div>
+                </article>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="$('#postForm').submit()">
+                    <i class="bi bi-check-circle"></i> Looks Good, Save Post
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(document).ready(function() {
+    let autoSaveTimer;
+    let lastSavedContent = '';
+    
+    // Auto-save functionality
+    function autoSave() {
+        const title = $('#title').val().trim();
+        const content = $('#content').val().trim();
+        const currentContent = title + '|' + content;
+        
+        if (currentContent !== lastSavedContent && (title || content)) {
+            localStorage.setItem('draft_title', title);
+            localStorage.setItem('draft_content', content);
+            localStorage.setItem('draft_timestamp', new Date().toISOString());
+            
+            lastSavedContent = currentContent;
+            updateAutoSaveStatus('Draft saved');
+            
+            setTimeout(() => {
+                updateAutoSaveStatus('');
+            }, 3000);
+        }
+    }
+    
+    function updateAutoSaveStatus(message) {
+        $('#autoSaveStatus').text(message);
+    }
+    
+    // Set up auto-save on input
+    $('#title, #content').on('input', function() {
+        clearTimeout(autoSaveTimer);
+        autoSaveTimer = setTimeout(autoSave, 2000); // Save after 2 seconds of inactivity
+    });
+    
+    // Load existing draft if available
+    const draftTitle = localStorage.getItem('draft_title');
+    const draftContent = localStorage.getItem('draft_content');
+    const draftTimestamp = localStorage.getItem('draft_timestamp');
+    
+    if ((draftTitle || draftContent) && !$('#title').val() && !$('#content').val()) {
+        const draftDate = new Date(draftTimestamp).toLocaleString();
+        if (confirm(`A draft from ${draftDate} was found. Would you like to restore it?`)) {
+            $('#title').val(draftTitle || '');
+            $('#content').val(draftContent || '');
+            lastSavedContent = (draftTitle || '') + '|' + (draftContent || '');
+        } else {
+            // Clear draft if user doesn't want it
+            localStorage.removeItem('draft_title');
+            localStorage.removeItem('draft_content');
+            localStorage.removeItem('draft_timestamp');
+        }
+    }
+    
+    // Clear draft on successful submission
+    $('#postForm').on('submit', function() {
+        localStorage.removeItem('draft_title');
+        localStorage.removeItem('draft_content');
+        localStorage.removeItem('draft_timestamp');
+        
+        // Show loading state
+        const $button = $(this).find('button[type="submit"]');
+        const originalText = $button.text();
+        $button.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span>Saving...');
+    });
+    
+    // Preview functionality
+    $('#previewBtn').on('click', function() {
+        const title = $('#title').val().trim() || 'Untitled Post';
+        const content = $('#content').val().trim() || 'No content yet...';
+        const isPublished = $('#is_published').is(':checked');
+        const currentDate = new Date().toLocaleDateString();
+        
+        $('#previewTitle').text(title);
+        $('#previewContent').html(content.replace(/\n/g, '<br>'));
+        $('#previewDate').text(currentDate);
+        
+        const statusBadge = $('#previewStatus');
+        if (isPublished) {
+            statusBadge.removeClass('bg-secondary').addClass('bg-success').text('Will be Published');
+        } else {
+            statusBadge.removeClass('bg-success').addClass('bg-secondary').text('Will be Saved as Draft');
+        }
+        
+        const modal = new bootstrap.Modal(document.getElementById('previewModal'));
+        modal.show();
+    });
+    
+    // Character count for title
+    $('#title').on('input', function() {
+        const length = $(this).val().length;
+        const maxLength = $(this).attr('maxlength');
+        const remaining = maxLength - length;
+        
+        let $counter = $(this).siblings('.char-counter');
+        if ($counter.length === 0) {
+            $counter = $('<div class="char-counter small text-end mt-1"></div>');
+            $(this).parent().append($counter);
+        }
+        
+        $counter.text(`${remaining} characters remaining`);
+        
+        if (remaining < 20) {
+            $counter.addClass('text-warning').removeClass('text-muted');
+        } else {
+            $counter.addClass('text-muted').removeClass('text-warning');
+        }
+    });
+    
+    // Word count for content
+    $('#content').on('input', function() {
+        const text = $(this).val();
+        const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
+        const charCount = text.length;
+        const maxLength = $(this).attr('maxlength');
+        
+        let $counter = $(this).siblings('.word-counter');
+        if ($counter.length === 0) {
+            $counter = $('<div class="word-counter small text-end mt-1"></div>');
+            $(this).parent().append($counter);
+        }
+        
+        $counter.text(`${wordCount} words, ${charCount}/${maxLength} characters`);
+    });
+    
+    // Warn before leaving with unsaved changes
+    window.addEventListener('beforeunload', function(e) {
+        const title = $('#title').val().trim();
+        const content = $('#content').val().trim();
+        
+        if ((title || content) && !$('#postForm').data('submitted')) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
+    });
+    
+    // Mark form as submitted
+    $('#postForm').on('submit', function() {
+        $(this).data('submitted', true);
+    });
+    
+    // Auto-focus on title field
+    $('#title').focus();
+    
+    console.log('Create post form initialized');
+});
+</script>
+{% endblock %} 

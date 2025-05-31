@@ -1,0 +1,33 @@
+{
+  "name": "Flask Full Stack Web App",
+  "description": "A comprehensive Flask blog application with user authentication, categories, and modern UI",
+  "image": "heroku/python",
+  "repository": "https://github.com/your-username/flask-app",
+  "keywords": ["python", "flask", "blog", "web-app", "bootstrap"],
+  "addons": [
+    {
+      "plan": "heroku-postgresql:mini"
+    }
+  ],
+  "env": {
+    "SECRET_KEY": {
+      "description": "A secret key for your app",
+      "generator": "secret"
+    },
+    "FLASK_DEBUG": {
+      "description": "Debug mode",
+      "value": "False"
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "eco"
+    }
+  },
+  "buildpacks": [
+    {
+      "url": "heroku/python"
+    }
+  ]
+} 

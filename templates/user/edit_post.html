@@ -1,0 +1,272 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0">
+                    <i class="bi bi-pencil"></i> Edit Post
+                </h3>
+                <p class="mb-0 text-muted">Last updated: {{ post.updated_at.strftime('%B %d, %Y at %I:%M %p') if post.updated_at else post.created_at.strftime('%B %d, %Y at %I:%M %p') }}</p>
+            </div>
+            <div class="card-body">
+                <form method="POST" id="postForm">
+                    {{ form.hidden_tag() }}
+                    
+                    <!-- Title Field -->
+                    <div class="form-floating mb-3">
+                        {{ form.title(class="form-control", maxlength="100") }}
+                        {{ form.title.label(class="form-label") }}
+                        {% if form.title.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.title.errors[0] }}
+                            </div>
+                        {% endif %}
+                        <div class="form-text">
+                            <small class="text-muted">Choose a compelling title for your post</small>
+                        </div>
+                    </div>
+
+                    <!-- Content Field -->
+                    <div class="mb-3">
+                        {{ form.content.label(class="form-label") }}
+                        {{ form.content(class="form-control", maxlength="5000") }}
+                        {% if form.content.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.content.errors[0] }}
+                            </div>
+                        {% endif %}
+                        <div class="form-text">
+                            <small class="text-muted">Share your thoughts, ideas, or stories with the community</small>
+                        </div>
+                    </div>
+
+                    <!-- Publishing Options -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                {{ form.is_published(class="form-check-input") }}
+                                {{ form.is_published.label(class="form-check-label") }}
+                                <div class="form-text">
+                                    <small class="text-muted">Uncheck to save as draft</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <div id="changeIndicator" class="text-muted small"></div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex gap-2 justify-content-between">
+                        <div class="btn-group">
+                            <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Back to Dashboard
+                            </a>
+                            <a href="{{ url_for('main.view_post', id=post.id) }}" class="btn btn-outline-info">
+                                <i class="bi bi-eye"></i> View Post
+                            </a>
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" id="previewBtn" class="btn btn-outline-info">
+                                <i class="bi bi-eye"></i> Preview
+                            </button>
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Post History -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-clock-history"></i> Post Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Created:</strong> {{ post.created_at.strftime('%B %d, %Y at %I:%M %p') }}</p>
+                        <p><strong>Status:</strong> 
+                            {% if post.is_published %}
+                                <span class="badge bg-success"><i class="bi bi-eye"></i> Published</span>
+                            {% else %}
+                                <span class="badge bg-secondary"><i class="bi bi-file-earmark"></i> Draft</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        {% if post.updated_at and post.updated_at != post.created_at %}
+                            <p><strong>Last Updated:</strong> {{ post.updated_at.strftime('%B %d, %Y at %I:%M %p') }}</p>
+                        {% else %}
+                            <p><strong>Last Updated:</strong> <span class="text-muted">Never</span></p>
+                        {% endif %}
+                        <p><strong>Word Count:</strong> <span id="currentWordCount">{{ post.content.split()|length }}</span> words</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Preview Modal -->
+<div class="modal fade" id="previewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-eye"></i> Post Preview
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <article class="post-preview">
+                    <h2 id="previewTitle">Post Title</h2>
+                    <div class="post-meta mb-3">
+                        <small class="text-muted">
+                            <i class="bi bi-person"></i> By {{ current_user.get_full_name() }}
+                            <span class="mx-2">•</span>
+                            <i class="bi bi-calendar"></i> <span id="previewDate"></span>
+                            <span class="mx-2">•</span>
+                            <span id="previewStatus" class="badge"></span>
+                        </small>
+                    </div>
+                    <div id="previewContent" class="post-content"></div>
+                </article>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="$('#postForm').submit()">
+                    <i class="bi bi-check-circle"></i> Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(document).ready(function() {
+    // Store original values to track changes
+    const originalTitle = $('#title').val();
+    const originalContent = $('#content').val();
+    const originalPublished = $('#is_published').is(':checked');
+    
+    let hasChanges = false;
+    
+    function checkForChanges() {
+        const currentTitle = $('#title').val();
+        const currentContent = $('#content').val();
+        const currentPublished = $('#is_published').is(':checked');
+        
+        hasChanges = (currentTitle !== originalTitle) || 
+                    (currentContent !== originalContent) || 
+                    (currentPublished !== originalPublished);
+        
+        if (hasChanges) {
+            $('#changeIndicator').text('Unsaved changes').addClass('text-warning');
+        } else {
+            $('#changeIndicator').text('No changes').removeClass('text-warning').addClass('text-muted');
+        }
+        
+        // Update word count
+        const wordCount = currentContent.trim() ? currentContent.trim().split(/\s+/).length : 0;
+        $('#currentWordCount').text(wordCount);
+    }
+    
+    // Check for changes on input
+    $('#title, #content, #is_published').on('input change', checkForChanges);
+    
+    // Initial check
+    checkForChanges();
+    
+    // Form submission
+    $('#postForm').on('submit', function(e) {
+        const $button = $(this).find('button[type="submit"]');
+        const originalText = $button.text();
+        $button.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span>Updating...');
+    });
+    
+    // Preview functionality
+    $('#previewBtn').on('click', function() {
+        const title = $('#title').val().trim() || 'Untitled Post';
+        const content = $('#content').val().trim() || 'No content yet...';
+        const isPublished = $('#is_published').is(':checked');
+        const currentDate = new Date().toLocaleDateString();
+        
+        $('#previewTitle').text(title);
+        $('#previewContent').html(content.replace(/\n/g, '<br>'));
+        $('#previewDate').text(currentDate);
+        
+        const statusBadge = $('#previewStatus');
+        if (isPublished) {
+            statusBadge.removeClass('bg-secondary').addClass('bg-success').text('Published');
+        } else {
+            statusBadge.removeClass('bg-success').addClass('bg-secondary').text('Draft');
+        }
+        
+        const modal = new bootstrap.Modal(document.getElementById('previewModal'));
+        modal.show();
+    });
+    
+    // Character count for title
+    $('#title').on('input', function() {
+        const length = $(this).val().length;
+        const maxLength = $(this).attr('maxlength');
+        const remaining = maxLength - length;
+        
+        let $counter = $(this).siblings('.char-counter');
+        if ($counter.length === 0) {
+            $counter = $('<div class="char-counter small text-end mt-1"></div>');
+            $(this).parent().append($counter);
+        }
+        
+        $counter.text(`${remaining} characters remaining`);
+        
+        if (remaining < 20) {
+            $counter.addClass('text-warning').removeClass('text-muted');
+        } else {
+            $counter.addClass('text-muted').removeClass('text-warning');
+        }
+    });
+    
+    // Word count for content
+    $('#content').on('input', function() {
+        const text = $(this).val();
+        const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
+        const charCount = text.length;
+        const maxLength = $(this).attr('maxlength');
+        
+        let $counter = $(this).siblings('.word-counter');
+        if ($counter.length === 0) {
+            $counter = $('<div class="word-counter small text-end mt-1"></div>');
+            $(this).parent().append($counter);
+        }
+        
+        $counter.text(`${wordCount} words, ${charCount}/${maxLength} characters`);
+    });
+    
+    // Trigger initial input events to show counters
+    $('#title, #content').trigger('input');
+    
+    // Warn before leaving with unsaved changes
+    window.addEventListener('beforeunload', function(e) {
+        if (hasChanges && !$('#postForm').data('submitted')) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
+    });
+    
+    // Mark form as submitted
+    $('#postForm').on('submit', function() {
+        $(this).data('submitted', true);
+    });
+    
+    console.log('Edit post form initialized');
+});
+</script>
+{% endblock %} 
