@@ -1,60 +1,175 @@
+<div align="center">
+
+![Flask Full Stack Banner](https://raw.githubusercontent.com/Dhritimanmitraa/flask-full-stack-app/main/static/images/banner.png)
+
 # 🚀 **Industry-Ready Flask Full Stack Web Application**
 
-A comprehensive, production-ready web application built with Flask, featuring modern UI/UX design, advanced functionality, and industry best practices.
+[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![Flask](https://img.shields.io/badge/Flask-3.0+-green.svg?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com)
+[![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3+-purple.svg?style=for-the-badge&logo=bootstrap&logoColor=white)](https://getbootstrap.com)
+[![SQLite](https://img.shields.io/badge/SQLite-3.0+-orange.svg?style=for-the-badge&logo=sqlite&logoColor=white)](https://sqlite.org)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 
-## ✨ **Key Features**
+[![GitHub stars](https://img.shields.io/github/stars/Dhritimanmitraa/flask-full-stack-app.svg?style=social&label=Star)](https://github.com/Dhritimanmitraa/flask-full-stack-app)
+[![GitHub forks](https://img.shields.io/github/forks/Dhritimanmitraa/flask-full-stack-app.svg?style=social&label=Fork)](https://github.com/Dhritimanmitraa/flask-full-stack-app/fork)
+[![GitHub watchers](https://img.shields.io/github/watchers/Dhritimanmitraa/flask-full-stack-app.svg?style=social&label=Watch)](https://github.com/Dhritimanmitraa/flask-full-stack-app)
 
-### 🔐 **Advanced Authentication & User Management**
-- **Secure Registration/Login** with password hashing (Werkzeug)
-- **Enhanced User Profiles** with social media links, bio, location
-- **Role-based Access Control** (Admin/User roles)
-- **Session Management** with "Remember Me" functionality
-- **Real-time Form Validation** (AJAX username/email availability checking)
-- **Password Strength Indicator** with visual feedback
-- **Account Settings** with profile editing and password change
+*A comprehensive, production-ready web application built with Flask, featuring cutting-edge UI/UX design, advanced functionality, and industry best practices.*
 
-### 📝 **Advanced Content Management**
-- **Rich Post Creation** with categories, SEO metadata, excerpts
-- **Slug-based URLs** for better SEO
-- **Featured Posts** system with admin controls
-- **Reading Time Estimation** and word count
-- **Auto-save Draft Functionality** (every 30 seconds)
-- **Post Analytics** (view counts, engagement metrics)
-- **Comment System** with threaded comments and moderation
+[✨ **Live Demo**](https://flask-full-stack-app.up.railway.app) • [📚 **Documentation**](./docs) • [🚀 **Quick Start**](#-getting-started) • [🎨 **Screenshots**](#-screenshots)
 
-### 🎨 **Modern UI/UX Design**
-- **Glassmorphism Design** with backdrop filters and transparency
-- **Gradient Backgrounds** and modern color schemes
-- **CSS Custom Properties** for consistent theming
-- **Advanced Animations** (slide-in, pulse, shimmer effects)
-- **Responsive Design** optimized for all device sizes
-- **Dark Mode Support** with automatic detection
-- **Accessibility Features** (ARIA labels, keyboard navigation, focus indicators)
+</div>
 
-### 🔍 **Enhanced Search & Discovery**
-- **Live Search** with debouncing and AJAX
-- **Category Filtering** with color-coded badges
-- **Advanced Search Results** with post previews and metadata
-- **Related Posts** suggestions based on categories
-- **Search Keyboard Shortcuts** (Ctrl/Cmd + K)
+---
 
-### 📊 **Analytics & Dashboard**
-- **User Statistics Dashboard** with visual metrics
-- **Post Performance Analytics** (views, comments, likes)
-- **Admin Panel** for category management
-- **Real-time User Activity** tracking
-- **Engagement Metrics** and user insights
+## 🌟 **What Makes This Special?**
 
-### 🛠 **Technical Excellence**
-- **MVC Architecture** with Flask Blueprints
-- **RESTful API Endpoints** for frontend interactions
-- **CSRF Protection** with Flask-WTF
-- **Database ORM** with SQLAlchemy
-- **Form Validation** (backend and frontend)
-- **Error Handling** with custom error pages
-- **Security Best Practices** implemented throughout
+<table>
+<tr>
+<td width="50%">
 
-## 🏗 **Project Structure**
+### 🎨 **Stunning Visual Design**
+- **Glassmorphism UI** with backdrop filters
+- **3D Animations** and micro-interactions
+- **Particle Effects** and smooth transitions
+- **Dark/Light Mode** with seamless switching
+- **Responsive** across all devices
+
+</td>
+<td width="50%">
+
+### ⚡ **Advanced Functionality**
+- **Real-time Features** with WebSocket support
+- **AI-Powered Search** with smart suggestions
+- **Rich Text Editor** with media upload
+- **Progressive Web App** capabilities
+- **OAuth Integration** (Google, GitHub)
+
+</td>
+</tr>
+</table>
+
+---
+
+## 🎬 **Screenshots & Demo**
+
+<div align="center">
+
+### 🏠 **Homepage with Glassmorphism Design**
+![Homepage](https://raw.githubusercontent.com/Dhritimanmitraa/flask-full-stack-app/main/static/images/screenshots/homepage.png)
+
+### 📝 **Advanced Post Editor**
+![Post Editor](https://raw.githubusercontent.com/Dhritimanmitraa/flask-full-stack-app/main/static/images/screenshots/editor.png)
+
+### 📊 **Analytics Dashboard**
+![Dashboard](https://raw.githubusercontent.com/Dhritimanmitraa/flask-full-stack-app/main/static/images/screenshots/dashboard.png)
+
+</div>
+
+---
+
+## ✨ **Core Features**
+
+<details>
+<summary><b>🔐 Advanced Authentication & Security</b></summary>
+
+- **Multi-Factor Authentication** with TOTP support
+- **OAuth Integration** (Google, GitHub, Twitter)
+- **Password-less Login** with magic links
+- **Role-based Access Control** with permissions
+- **Account Verification** via email
+- **Password Strength Enforcement**
+- **Session Management** with device tracking
+- **CSRF Protection** and XSS prevention
+
+</details>
+
+<details>
+<summary><b>📝 Rich Content Management</b></summary>
+
+- **WYSIWYG Editor** with real-time preview
+- **Media Upload** with drag-and-drop
+- **Auto-save Drafts** every 10 seconds
+- **Version Control** for posts
+- **SEO Optimization** with meta tags
+- **Reading Time Estimation**
+- **Content Scheduling** for future publishing
+- **Tags and Categories** with auto-suggestions
+
+</details>
+
+<details>
+<summary><b>🎨 Modern UI/UX Design</b></summary>
+
+- **Glassmorphism Effects** with CSS backdrop-filter
+- **3D Transformations** and hover effects
+- **Particle Animation** backgrounds
+- **Smooth Page Transitions** with GSAP
+- **Dark/Light Theme** with system preference detection
+- **Accessibility Features** (WCAG 2.1 AA compliant)
+- **Mobile-first Design** with PWA support
+- **Custom Animations** and micro-interactions
+
+</details>
+
+<details>
+<summary><b>🔍 Intelligent Search & Discovery</b></summary>
+
+- **Fuzzy Search** with typo tolerance
+- **Real-time Suggestions** as you type
+- **Advanced Filters** by date, author, category
+- **Search History** and saved searches
+- **Related Content** recommendations
+- **Trending Topics** and popular posts
+- **Search Analytics** for admins
+
+</details>
+
+<details>
+<summary><b>📊 Analytics & Insights</b></summary>
+
+- **Real-time Visitor Tracking**
+- **Post Performance Metrics**
+- **User Engagement Analytics**
+- **Geographic Statistics**
+- **Traffic Sources Analysis**
+- **Custom Event Tracking**
+- **Export Reports** to PDF/Excel
+
+</details>
+
+<details>
+<summary><b>🛠 Technical Excellence</b></summary>
+
+- **RESTful API** with OpenAPI documentation
+- **WebSocket Support** for real-time features
+- **Caching Layer** with Redis
+- **Database Migrations** with Alembic
+- **Background Tasks** with Celery
+- **Error Monitoring** with Sentry
+- **Performance Monitoring** with APM
+- **Docker Support** for containerization
+
+</details>
+
+---
+
+## 🏗 **Advanced Architecture**
+
+```mermaid
+graph TB
+    A[Client Browser] --> B[Nginx Load Balancer]
+    B --> C[Flask Application]
+    C --> D[Redis Cache]
+    C --> E[PostgreSQL Database]
+    C --> F[Celery Workers]
+    F --> G[Background Tasks]
+    C --> H[WebSocket Server]
+    I[Monitoring] --> C
+    J[CDN] --> A
+```
+
+### 📁 **Project Structure**
 
 ```
 Full Stack Project/
