@@ -45,7 +45,7 @@
                 </div>
 
                 <!-- Action Buttons -->
-                {% if current_user.is_authenticated and current_user.id == post.user_id %}
+                {% if current_user.is_authenticated and (current_user.id == post.user_id or current_user.is_admin) %}
                     <hr class="my-4">
                     <div class="d-flex gap-2 justify-content-between">
                         <a href="{{ url_for('main.index') }}" class="btn btn-outline-secondary">

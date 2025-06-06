@@ -1,11 +1,11 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, session, abort
 from flask_login import login_user, logout_user, login_required, current_user
-from werkzeug.urls import url_parse
 from datetime import datetime
 from app import db
 from app.models import User, Post, Category, Comment
 from app.forms import (LoginForm, RegistrationForm, PostForm, SearchForm, 
                       UserProfileForm, CommentForm, CategoryForm, ChangePasswordForm)
+from urllib.parse import urlparse
 
 # Create blueprints
 main_bp = Blueprint('main', __name__)
@@ -147,12 +147,17 @@ def edit_post(id):
 @main_bp.route('/delete_post/<int:id>', methods=['POST'])
 @login_required
 def delete_post(id):
-    """Delete a post"""
-    post = Post.query.filter_by(id=id, user_id=current_user.id).first_or_404()
+    """Delete a post (author or admin)"""
+    post = Post.query.get_or_404(id)
+    # Only the author or an admin can delete
+    if post.user_id != current_user.id and not current_user.is_admin:
+        abort(403)
     db.session.delete(post)
     db.session.commit()
     flash('Your post has been deleted!', 'success')
-    return redirect(url_for('main.dashboard'))
+    # Redirect back to the page the user came from, or dashboard as fallback
+    next_url = request.referrer or url_for('main.dashboard')
+    return redirect(next_url)
 
 @main_bp.route('/post/<slug>')
 @main_bp.route('/post/<int:id>')
@@ -285,7 +290,7 @@ def login():
             login_user(user, remember=form.remember_me.data)
             
             next_page = request.args.get('next')
-            if not next_page or url_parse(next_page).netloc != '':
+            if not next_page or urlparse(next_page).netloc != '':
                 next_page = url_for('main.dashboard')
             
             flash(f'Welcome back, {user.get_display_name()}!', 'success')
@@ -490,4 +495,4 @@ def internal_error(error):
 @main_bp.app_errorhandler(403)
 def forbidden_error(error):
     """403 error handler"""
-    return render_template('errors/403.html'), 403 
+    return render_template('errors/403.html'), 403
