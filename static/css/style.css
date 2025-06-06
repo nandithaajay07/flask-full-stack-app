@@ -53,6 +53,8 @@ body {
     box-shadow: var(--shadow-md);
     padding: 1rem 0;
     transition: var(--transition-base);
+    position: relative;
+    z-index: 1100;
 }
 
 .navbar-brand {
@@ -87,6 +89,46 @@ body {
 .nav-link:hover::before,
 .nav-link.active::before {
     width: 80%;
+}
+
+/* Enhanced Dropdown Menu */
+.dropdown {
+    position: static;
+}
+
+.dropdown-menu {
+    position: absolute;
+    z-index: 9999 !important; /* Force highest z-index */
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: none;
+    box-shadow: var(--shadow-lg);
+    border-radius: var(--border-radius);
+    animation: slideDown 0.3s ease;
+    margin-top: 0.5rem;
+    min-width: 200px;
+    transform: none !important;
+    top: 100% !important;
+    left: auto !important;
+    right: 0 !important;
+}
+
+.dropdown-item {
+    padding: 0.75rem 1.5rem;
+    transition: var(--transition-base);
+    color: var(--dark-color);
+    font-weight: 500;
+}
+
+.dropdown-item:hover {
+    background: rgba(102, 126, 234, 0.1);
+    transform: translateX(5px);
+    color: var(--primary-color);
+}
+
+.dropdown-item:active {
+    background: var(--gradient-primary);
+    color: white;
 }
 
 /* ===== ENHANCED SEARCH BAR ===== */
@@ -245,6 +287,14 @@ body {
     z-index: 1000;
     box-shadow: var(--shadow-lg);
     animation: float 3s ease-in-out infinite;
+    pointer-events: none; /* Allow clicks to pass through when dropdown is open */
+}
+
+/* When dropdown is open, hide the floating button */
+.dropdown.show ~ .btn-floating {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
 }
 
 @keyframes float {
