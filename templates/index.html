@@ -1,38 +1,40 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row">
-    <!-- Hero Section -->
-    <div class="col-12 mb-5">
-        <div class="text-center py-5 bg-primary text-white rounded shadow">
-            <h1 class="display-4 fw-bold">Welcome to Flask App</h1>
-            <p class="lead">A full-stack web application built with Flask, Bootstrap 5, and jQuery</p>
-            {% if not current_user.is_authenticated %}
-                <div class="mt-4">
-                    <a href="{{ url_for('auth.register') }}" class="btn btn-light btn-lg me-3">
-                        <i class="bi bi-person-plus"></i> Get Started
-                    </a>
-                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-lg">
-                        <i class="bi bi-box-arrow-in-right"></i> Sign In
-                    </a>
-                </div>
-            {% else %}
-                <div class="mt-4">
-                    <a href="{{ url_for('main.create_post') }}" class="btn btn-light btn-lg me-3">
-                        <i class="bi bi-plus-circle"></i> Create Post
-                    </a>
-                    <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-light btn-lg">
-                        <i class="bi bi-speedometer2"></i> Dashboard
-                    </a>
-                </div>
-            {% endif %}
-        </div>
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="hero-content text-center">
+        <h1 class="display-4 fw-bold mb-4">Welcome to ProApp</h1>
+        <p class="lead mb-4">A professional web platform built with modern technologies</p>
+        {% if not current_user.is_authenticated %}
+            <div class="d-flex justify-content-center gap-3">
+                <a href="{{ url_for('auth.register') }}" class="btn btn-light btn-lg">
+                    <i class="bi bi-person-plus"></i> Get Started
+                </a>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-lg">
+                    <i class="bi bi-box-arrow-in-right"></i> Sign In
+                </a>
+            </div>
+        {% else %}
+            <div class="d-flex justify-content-center gap-3">
+                <a href="{{ url_for('main.create_post') }}" class="btn btn-light btn-lg">
+                    <i class="bi bi-plus-circle"></i> Create Post
+                </a>
+                <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-light btn-lg">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+            </div>
+        {% endif %}
     </div>
+</div>
 
+<div class="row">
     <!-- Main Content -->
     <div class="col-lg-8">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2><i class="bi bi-newspaper"></i> Latest Posts</h2>
+            <h2 class="fw-bold">
+                <i class="bi bi-newspaper text-primary"></i> Latest Posts
+            </h2>
             {% if current_user.is_authenticated %}
                 <a href="{{ url_for('main.create_post') }}" class="btn btn-primary">
                     <i class="bi bi-plus"></i> New Post
@@ -43,11 +45,11 @@
         <!-- Posts Section -->
         {% if posts.items %}
             {% for post in posts.items %}
-                <article class="card post-card mb-4">
+                <article class="card post-card">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-start mb-3">
                             <h3 class="card-title mb-0">
-                                <a href="{{ url_for('main.view_post', id=post.id) }}" class="text-decoration-none">
+                                <a href="{{ url_for('main.view_post', id=post.id) }}" class="text-decoration-none text-dark">
                                     {{ post.title }}
                                 </a>
                             </h3>
@@ -59,7 +61,7 @@
                         </div>
                         
                         <div class="post-meta mb-3">
-                            <small class="text-muted">
+                            <small>
                                 <i class="bi bi-person"></i> By {{ post.author.get_full_name() }}
                                 <span class="mx-2">•</span>
                                 <i class="bi bi-calendar"></i> {{ post.created_at.strftime('%B %d, %Y') }}
@@ -99,7 +101,7 @@
 
             <!-- Pagination -->
             {% if posts.pages > 1 %}
-                <nav aria-label="Posts pagination">
+                <nav aria-label="Posts pagination" class="mt-4">
                     <ul class="pagination justify-content-center">
                         {% if posts.has_prev %}
                             <li class="page-item">
@@ -138,12 +140,12 @@
                 </nav>
             {% endif %}
         {% else %}
-            <div class="text-center py-5">
-                <i class="bi bi-journal-x display-1 text-muted"></i>
-                <h3 class="mt-3 text-muted">No posts yet</h3>
-                <p class="text-muted">Be the first to share something interesting!</p>
+            <div class="empty-state">
+                <i class="bi bi-journal-x"></i>
+                <h3>No posts yet</h3>
+                <p>Be the first to share something interesting!</p>
                 {% if current_user.is_authenticated %}
-                    <a href="{{ url_for('main.create_post') }}" class="btn btn-primary mt-3">
+                    <a href="{{ url_for('main.create_post') }}" class="btn btn-primary">
                         <i class="bi bi-plus-circle"></i> Create Your First Post
                     </a>
                 {% endif %}
@@ -153,48 +155,76 @@
 
     <!-- Sidebar -->
     <div class="col-lg-4">
-        <div class="sticky-top" style="top: 20px;">
+        <div class="sticky-top">
             <!-- Welcome Card -->
-            <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> About This App</h5>
+            <div class="card sidebar-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-circle text-primary"></i> About ProApp
+                    </h5>
                 </div>
                 <div class="card-body">
                     <p class="card-text">
-                        This is a full-stack web application built with:
+                        A professional web platform built with modern technologies:
                     </p>
                     <ul class="list-unstyled">
-                        <li><i class="bi bi-check-circle text-success"></i> Flask (Python)</li>
-                        <li><i class="bi bi-check-circle text-success"></i> Bootstrap 5</li>
-                        <li><i class="bi bi-check-circle text-success"></i> jQuery</li>
-                        <li><i class="bi bi-check-circle text-success"></i> SQLAlchemy</li>
-                        <li><i class="bi bi-check-circle text-success"></i> AJAX</li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i> Flask (Python)
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i> Bootstrap 5
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i> jQuery
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i> SQLAlchemy
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i> AJAX
+                        </li>
                     </ul>
                 </div>
             </div>
 
             <!-- Features Card -->
-            <div class="card mb-4">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0"><i class="bi bi-star"></i> Features</h5>
+            <div class="card sidebar-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-star text-warning"></i> Features
+                    </h5>
                 </div>
                 <div class="card-body">
                     <ul class="list-unstyled">
-                        <li><i class="bi bi-shield-check text-primary"></i> User Authentication</li>
-                        <li><i class="bi bi-search text-primary"></i> Live Search</li>
-                        <li><i class="bi bi-pencil text-primary"></i> CRUD Operations</li>
-                        <li><i class="bi bi-phone text-primary"></i> Responsive Design</li>
-                        <li><i class="bi bi-lightning text-primary"></i> AJAX Interactions</li>
-                        <li><i class="bi bi-check2-all text-primary"></i> Form Validation</li>
+                        <li class="mb-2">
+                            <i class="bi bi-shield-check text-primary me-2"></i> User Authentication
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-search text-primary me-2"></i> Live Search
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-pencil text-primary me-2"></i> CRUD Operations
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-phone text-primary me-2"></i> Responsive Design
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-lightning text-primary me-2"></i> AJAX Interactions
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check2-all text-primary me-2"></i> Form Validation
+                        </li>
                     </ul>
                 </div>
             </div>
 
             <!-- Quick Actions -->
             {% if current_user.is_authenticated %}
-                <div class="card">
-                    <div class="card-header bg-info text-white">
-                        <h5 class="mb-0"><i class="bi bi-lightning"></i> Quick Actions</h5>
+                <div class="card sidebar-card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-lightning text-info"></i> Quick Actions
+                        </h5>
                     </div>
                     <div class="card-body">
                         <div class="d-grid gap-2">
@@ -208,9 +238,11 @@
                     </div>
                 </div>
             {% else %}
-                <div class="card">
-                    <div class="card-header bg-warning text-dark">
-                        <h5 class="mb-0"><i class="bi bi-person-plus"></i> Join Us</h5>
+                <div class="card sidebar-card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-person-plus text-warning"></i> Join Us
+                        </h5>
                     </div>
                     <div class="card-body">
                         <p class="card-text">Join our community to create and share your own posts!</p>

@@ -3,18 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Flask Full Stack Web Application - A comprehensive blog platform with user authentication, CRUD operations, and modern UI">
-    <meta name="keywords" content="Flask, Python, Bootstrap, jQuery, Blog, Web Application">
-    <meta name="author" content="Flask App">
+    <meta name="description" content="ProApp - Professional Web Platform - A comprehensive blog platform with user authentication, CRUD operations, and modern UI">
+    <meta name="keywords" content="ProApp, Flask, Python, Bootstrap, jQuery, Blog, Web Application, Professional">
+    <meta name="author" content="ProApp Team">
     
     {% if title %}
-        <title>{{ title }} - Flask App</title>
+        <title>{{ title }} - ProApp</title>
     {% else %}
-        <title>Welcome to Flask App</title>
+        <title>ProApp - Professional Web Platform</title>
     {% endif %}
     
     <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/favicon.svg') }}">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -28,13 +33,14 @@
 </head>
 <body>
     <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('main.index') }}">
-                <i class="bi bi-journal-text"></i> Flask App
+            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('main.index') }}">
+                <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="ProApp Logo" height="40" class="me-2">
+                <span class="brand-text">ProApp</span>
             </a>
             
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             
@@ -62,7 +68,7 @@
                 <!-- Search Form -->
                 <form class="d-flex me-3" id="searchForm">
                     <div class="position-relative">
-                        <input class="form-control" type="search" id="searchInput" placeholder="Search posts..." aria-label="Search">
+                        <input class="form-control search-input" type="search" id="searchInput" placeholder="Search posts..." aria-label="Search">
                         <div id="searchResults" class="position-absolute bg-white border rounded shadow-sm w-100 d-none" style="top: 100%; z-index: 1000; max-height: 300px; overflow-y: auto;"></div>
                     </div>
                 </form>
@@ -70,12 +76,20 @@
                 <ul class="navbar-nav">
                     {% if current_user.is_authenticated %}
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                <i class="bi bi-person-circle"></i> {{ current_user.get_full_name() }}
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <div class="avatar-circle me-2">
+                                    <span>{{ current_user.get_full_name()[0] }}</span>
+                                </div>
+                                <span class="d-none d-md-inline">{{ current_user.get_full_name() }}</span>
                             </a>
-                            <ul class="dropdown-menu">
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><h6 class="dropdown-header">Welcome, {{ current_user.get_full_name() }}</h6></li>
+                                <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{{ url_for('main.dashboard') }}">
                                     <i class="bi bi-speedometer2"></i> Dashboard
+                                </a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('main.profile', username=current_user.username) }}">
+                                    <i class="bi bi-person"></i> Profile
                                 </a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">
@@ -90,8 +104,8 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('auth.register') }}">
-                                <i class="bi bi-person-plus"></i> Register
+                            <a class="nav-link btn btn-outline-light btn-sm ms-2" href="{{ url_for('auth.register') }}">
+                                <i class="bi bi-person-plus"></i> Sign Up
                             </a>
                         </li>
                     {% endif %}
@@ -100,35 +114,47 @@
         </div>
     </nav>
 
-    <!-- Flash Messages -->
-    <div class="container mt-3">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-    </div>
+    <!-- Main Content with top padding for fixed navbar -->
+    <main class="main-content">
+        <!-- Flash Messages -->
+        <div class="container mt-5 pt-4">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                            <i class="bi bi-{{ 'exclamation-triangle' if category == 'error' else 'info-circle' }} me-2"></i>
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
 
-    <!-- Main Content -->
-    <main class="container mt-4">
-        {% block content %}{% endblock %}
+        <!-- Page Content -->
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
     </main>
 
     <!-- Footer -->
-    <footer class="bg-light mt-5 py-4">
+    <footer class="footer mt-auto">
         <div class="container">
-            <div class="row">
+            <div class="row align-items-center">
                 <div class="col-md-6">
-                    <h5>Flask Full Stack App</h5>
-                    <p class="text-muted">A comprehensive web application built with Flask, Bootstrap 5, and jQuery.</p>
+                    <div class="d-flex align-items-center">
+                        <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="ProApp Logo" height="30" class="me-2">
+                        <span class="text-white fw-semibold">ProApp</span>
+                    </div>
+                    <p class="text-muted mb-0 mt-2">Professional Web Platform - Built with modern technologies</p>
                 </div>
                 <div class="col-md-6 text-md-end">
-                    <p class="text-muted">&copy; 2025 Flask App. All rights reserved.</p>
+                    <div class="footer-links">
+                        <a href="#" class="text-muted me-3">Privacy Policy</a>
+                        <a href="#" class="text-muted me-3">Terms of Service</a>
+                        <a href="#" class="text-muted">Contact</a>
+                    </div>
+                    <p class="text-muted mb-0 mt-2">&copy; {{ moment().format('YYYY') }} ProApp. All rights reserved.</p>
                 </div>
             </div>
         </div>
